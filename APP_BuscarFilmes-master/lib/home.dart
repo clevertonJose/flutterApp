@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:firebase_admob/firebase_admob.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -116,11 +116,44 @@ class Filme extends StatefulWidget {
 }
 
 class _FilmeState extends State<Filme> {
+  MobileAdTargetingInfo targetingInfo;
+  BannerAd myBanner;
+  @override
+  void initState() {
+    super.initState();
+    targetingInfo = MobileAdTargetingInfo(
+      keywords: <String>['flutterio', 'beautiful apps'],
+      contentUrl: 'https://flutter.io',
+      birthday: DateTime.now(),
+      childDirected: false,
+      designedForFamilies: false,
+      gender: MobileAdGender
+          .male, // or MobileAdGender.female, MobileAdGender.unknown
+      testDevices: <String>[], // Android emulators are considered test devices
+    );
+    myBanner = BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event is $event");
+      },
+    );
+  }
+
+  void _show_banner() {
+    myBanner
+      // typically this happens well before the ad is shown
+      ..load()
+      ..show(
+          // Positions the banner ad 60 pixels from the bottom of the screen
+
+          );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       backgroundColor: Colors.blueGrey,
       body: FutureBuilder(
         future: widget.getData(),
@@ -141,7 +174,6 @@ class _FilmeState extends State<Filme> {
             default:
               if (snapshot.hasData) {
                 return Scaffold(
-                  
                   backgroundColor: Colors.black45,
                   body: SingleChildScrollView(
                     padding: EdgeInsets.only(
@@ -299,12 +331,14 @@ class _FilmeState extends State<Filme> {
                             color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
-                          
                         ),
-                      
                         Padding(
                           padding: EdgeInsets.only(bottom: 50.0),
                         ),
+                        RaisedButton(
+                          onPressed: _show_banner,
+                          child: Text('Dinheiro'),
+                        )
                       ],
                     ),
                   ),
