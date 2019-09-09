@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
               controller: titulo,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
-                labelText: 'Nome do Filme*',
+                labelText: 'Nome do Filme/Série*',
                 labelStyle: TextStyle(color: Colors.white),
               ),
               style: TextStyle(fontSize: 18, color: Colors.white),
@@ -80,7 +80,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-//SEGUNDA TELA
 class Filme extends StatefulWidget {
   Future<Map> getData() async {
     var request = "http://www.omdbapi.com/?t=$titulo&y=$ano&apikey=bfc23be5";
@@ -116,43 +115,44 @@ class Filme extends StatefulWidget {
 }
 
 class _FilmeState extends State<Filme> {
+
+  //Propagandas
   MobileAdTargetingInfo targetingInfo;
   BannerAd myBanner;
+  InterstitialAd myInterstitial;
   @override
   void initState() {
     super.initState();
-    targetingInfo = MobileAdTargetingInfo(
-      keywords: <String>['flutterio', 'beautiful apps'],
-      contentUrl: 'https://flutter.io',
-      birthday: DateTime.now(),
-      childDirected: false,
-      designedForFamilies: false,
-      gender: MobileAdGender
-          .male, // or MobileAdGender.female, MobileAdGender.unknown
-      testDevices: <String>[], // Android emulators are considered test devices
-    );
+    targetingInfo = MobileAdTargetingInfo();
+    //Propaganda Banner, Rodapé
     myBanner = BannerAd(
       adUnitId: BannerAd.testAdUnitId,
+      //Tamanho do banner
       size: AdSize.banner,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
-        print("BannerAd event is $event");
+        print("$event");
       },
     );
-  }
 
-  void _show_banner() {
-    myBanner
-      // typically this happens well before the ad is shown
-      ..load()
-      ..show(
-          // Positions the banner ad 60 pixels from the bottom of the screen
-
-          );
+    //Proganda Tela inteira
+    myInterstitial = new InterstitialAd(
+        adUnitId: InterstitialAd.testAdUnitId,
+        targetingInfo: targetingInfo,
+        //Mostrar o resultado no console
+        listener: (MobileAdEvent event) {
+          print("$event");
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    //Iniciar Propaganda(Banner)
+    myBanner..load()..show();
+
+    //Iniciar Propaganda(Tela inteira)
+    myInterstitial..load()..show();
+
     return Scaffold(
       backgroundColor: Colors.blueGrey,
       body: FutureBuilder(
@@ -209,7 +209,6 @@ class _FilmeState extends State<Filme> {
                           height: 430,
                         ),
                         TextField(
-                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             labelStyle: TextStyle(color: Colors.white),
                           ),
@@ -217,7 +216,6 @@ class _FilmeState extends State<Filme> {
                           textAlign: TextAlign.center,
                         ),
                         TextField(
-                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             labelText: 'Data de lançamento: ',
                             labelStyle: TextStyle(color: Colors.white),
@@ -226,7 +224,6 @@ class _FilmeState extends State<Filme> {
                           textAlign: TextAlign.center,
                         ),
                         TextField(
-                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             labelText: snapshot.data['Released'],
                             labelStyle: TextStyle(color: Colors.white),
@@ -333,12 +330,8 @@ class _FilmeState extends State<Filme> {
                           textAlign: TextAlign.center,
                         ),
                         Padding(
-                          padding: EdgeInsets.only(bottom: 50.0),
+                          padding: EdgeInsets.only(bottom: 40.0),
                         ),
-                        RaisedButton(
-                          onPressed: _show_banner,
-                          child: Text('Dinheiro'),
-                        )
                       ],
                     ),
                   ),
